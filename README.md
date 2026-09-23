@@ -5,17 +5,15 @@
 ## 📌 Problem Statement
 Build an office secure file storage application
 ## ✨ Features & Evaluation Criteria
-The system evaluates password integrity across seven key security vectors[cite: 1]:
-- 📏 **Password Length:** Validates minimum length thresholds and awards higher scores for extended passphrases[cite: 1].
-- 🔣 **Character Diversity:** Measures complexity using uppercase, lowercase, numeric, and special symbol character sets[cite: 1].
-- 🔁 **Repeated Characters:** Identifies redundant character patterns and consecutive repetitions (e.g., `aaaaa`)[cite: 1].
-- 🔢 **Sequential Characters:** Flags ascending or descending alphabetical, numerical, and keyboard sequences (e.g., `12345`, `qwerty`)[cite: 1].
-- 🧩 **Predictable Combinations:** Identifies common substitution tricks like leetspeak (e.g., `P@ssw0rd`)[cite: 1].
-- 📚 **Common Password Patterns:** Matches input against known dictionary leaks, common phrases, and default credentials[cite: 1].
-- 🔍 **Obvious Structures:** Flags predictable layouts such as capitalizing only the first letter followed by trailing numbers (e.g., `Admin123!`)[cite: 1].
+The system evaluates password integrity across seven key security vectors
+- 📏 **Password Length:** Validates minimum length thresholds and awards higher scores for extended passphrases
+- 🔣 **Character Diversity:** Measures complexity using uppercase, lowercase, numeric, and special symbol character sets
+- 🔁 **Repeated Characters:** Identifies redundant character patterns and consecutive repetitions 
+- 🔢 **Sequential Characters:** Flags ascending or descending alphabetical, numerical, and keyboard sequences 
+- 🧩 **Predictable Combinations:** Identifies common substitution tricks like leetspeak 
+- 📚 **Common Password Patterns:** Matches input against known dictionary leaks, common phrases, and default credentials
+- 🔍 **Obvious Structures:** Flags predictable layouts such as capitalizing only the first letter followed by trailing numbers
 ## 🛠️ Project Structure
-
-```text
 cyberclash-password-evaluator/
 ├── .github/
 │   └── workflows/
