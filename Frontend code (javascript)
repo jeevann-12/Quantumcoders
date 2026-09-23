@@ -1,0 +1,75 @@
+const express = require('express');
+const cors = require('cors');
+const app = express();
+const PORT = process.env.PORT || 3000;
+app.use(express.json());
+app.use(cors());
+// In-Memory Database Simulation
+let vault = {};
+let auditLogs = [];
+// Helper to Add Audit Logs
+function addAuditLog(user, action, status, details) {
+  const entry = {
+    time: new Date().toLocaleTimeString(),
+    user,
+    action,
+    status,
+    details
+  };
+  auditLogs.unshift(entry);
+}
+// Routes: Get Vault & Logs
+app.get('/api/vault', (req, res) => {
+  res.json({ vault, auditLogs });
+});
+// Route: Encrypt and Store File Data
+app.post('/api/vault/store', (req, res) => {
+  const { fileId, fileName, owner, salt, nonce, ciphertext } = req.body; 
+  if (!fileId || !ciphertext) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+  vault[fileId] = {
+    fileId,
+    fileName,
+    owner,
+    salt,
+    nonce,
+    ciphertext
+  };
+  addAuditLog(owner, "FILE_ENCRYPT", "SUCCESS", `File ID '${fileId}' securely stored in vault`);
+  res.json({ success: true, vault });
+});
+// Route: Access Control / Decrypt Verification check
+app.post('/api/vault/access', (req, res) => {
+  const { fileId, currentUser } = req.body;
+  const item = vault[fileId];
+  if (!item) {
+    return res.status(404).json({ error: "File not found" });
+  }
+  // RBAC Check
+  if (currentUser !== item.owner && currentUser !== 'admin') {
+    addAuditLog(currentUser, "FILE_DECRYPT", "ACCESS_DENIED", `Unauthorized access attempt on file ID '${fileId}' owned by ${item.owner}`);
+    return.status(403).json({ error: "ACCESS CONTROL DENIED: Unauthorized user." });
+  }
+  addAuditLog(currentUser, "FILE_DECRYPT", "SUCCESS", `Access authorized for file ID '${fileId}'`);
+  res.json({ success: true, item });
+});
+// Route: Simulate Tamper
+app.post('/api/vault/tamper', (req, res) => {
+  const { fileId, currentUser } = req.body;
+  const item = vault[fileId];
+  if (item && item.ciphertext.length > 0) {
+    item.ciphertext[0] = item.ciphertext[0] ^ 0xFF;
+    addAuditLog(currentUser, "TAMPER_SIMULATION", "SUCCESS", `Corrupted 1 byte of encrypted store for '${fileId}'`);
+    return res.json({ success: true, vault });
+  }
+  res.status(404).json({ error: "Item not found" });
+});
+// Route: Clear Logs
+app.delete('/api/logs', (req, res) => {
+  auditLogs = [];
+  res.json({ success: true });
+});
+app.listen(PORT, () => {
+  console.log(`LockBox Back-End running on http://localhost:${PORT}`);
+});
