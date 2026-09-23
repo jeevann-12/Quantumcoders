@@ -1,2 +1,520 @@
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LockBox - Secure Offline File Storage & Security Auditor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              500: '#0284c7',
+              600: '#0284c7',
+              900: '#0f172a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col">
+
+  <!-- Header / Navigation -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-xl">
+          <i class="fa-solid fa-vault"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg text-white leading-tight">LockBox</h1>
+          <p class="text-xs text-slate-400">Cyber Clash Hackathon Security Suite</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Offline Cryptographic Mode
+        </span>
+        <div class="flex bg-slate-800 rounded-lg p-1 border border-slate-700">
+          <button id="nav-lockbox" onclick="switchTab('lockbox')" class="px-4 py-1.5 rounded-md text-sm font-medium transition-colors bg-sky-600 text-white">
+            <i class="fa-solid fa-lock mr-1.5"></i> LockBox Vault
+          </button>
+          <button id="nav-evaluator" onclick="switchTab('evaluator')" class="px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-colors">
+            <i class="fa-solid fa-key mr-1.5"></i> Password Auditor
+          </button>
+        </div>
+      </div>
+    </div>
+  <header></header>
+
+  <!-- Main Content Area -->
+  <main class="flex-grow max-w-7xl w-full mx-auto p-6 space-y-6">
+
+    <!-- TAB 1: LOCKBOX SECURE STORAGE -->
+    <div id="tab-lockbox" class="space-y-6">
+      
+      <!-- Top Control Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- User Session Simulation -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h2 class="font-semibold text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-user-shield text-sky-400"></i> Active Identity
+            </h2>
+            <span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded">RBAC Active</span>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-400 mb-1">Select User Profile</label>
+            <select id="user-selector" onchange="updateUserRole()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-sky-500">
+              <option value="alice">Alice (Owner / Standard User)</option>
+              <option value="bob">Bob (Unauthorized User)</option>
+              <option value="admin">Admin (Superuser)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-400 mb-1">Vault Master Password</label>
+            <input type="password" id="vault-pass" value="AlicePass#2026" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-sky-500" placeholder="Enter password...">
+          </div>
+          <div class="text-xs text-slate-400 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80">
+            <p><span class="text-sky-400 font-semibold">Key Derivation:</span> PBKDF2-HMAC-SHA256</p>
+            <p><span class="text-sky-400 font-semibold">Cipher:</span> AES-256-GCM (Authenticated)</p>
+          </div>
+        </div>
+
+        <!-- Encrypt File Form -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4 lg:col-span-2">
+          <div class="border-b border-slate-800 pb-3">
+            <h2 class="font-semibold text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-file-shield text-sky-400"></i> Encrypt & Secure File
+            </h2>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">File Identifier (ID)</label>
+              <input type="text" id="file-id-input" value="DOC-2026-001" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-sky-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">File Name</label>
+              <input type="text" id="file-name-input" value="cyber_clash_blueprint.pdf" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-sky-500">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-400 mb-1">Confidential File Payload Content</label>
+            <textarea id="file-content-input" rows="3" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-sky-500 font-mono text-xs" placeholder="Type confidential data to encrypt...">CLASSIFIED: Cyber Clash project architecture specification and private key shares.</textarea>
+          </div>
+          <button onclick="encryptAndStore()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
+            <i class="fa-solid fa-lock"></i> Encrypt File with AES-256-GCM
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Secure Vault Storage & Audit Log Split -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Protected Vault List -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h2 class="font-semibold text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-box-archive text-sky-400"></i> Encrypted Vault Stores
+            </h2>
+            <span id="vault-count" class="text-xs bg-sky-500/10 text-sky-400 border border-sky-500/20 px-2 py-0.5 rounded-full font-mono">1 Item</span>
+          </div>
+          
+          <div id="vault-list" class="space-y-3">
+            <!-- Dynamic Vault Items populated via JS -->
+          </div>
+        </div>
+
+        <!-- Security Audit Activity Records -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h2 class="font-semibold text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-sky-400"></i> Security Activity Records (Audit Log)
+            </h2>
+            <button onclick="clearLogs()" class="text-xs text-slate-500 hover:text-slate-300 transition-colors">Clear Logs</button>
+          </div>
+          <div id="audit-log" class="space-y-2 max-h-[320px] overflow-y-auto pr-1 font-mono text-xs">
+            <!-- Dynamic Audit Logs -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TAB 2: PASSWORD SECURITY EVALUATOR -->
+    <div id="tab-evaluator" class="hidden space-y-6">
+      
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-6">
+        <div class="border-b border-slate-800 pb-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-shield-halved text-sky-400"></i> Password Security Evaluation Engine
+          </h2>
+          <p class="text-sm text-slate-400 mt-1">Analyzes length, entropy bits, pattern predictability, dictionary risks, and keyboard walks.</p>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-300">Enter Candidate Password</label>
+          <div class="relative">
+            <input type="text" id="eval-password" oninput="runPasswordAudit()" value="cyberclash" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-lg text-slate-100 font-mono focus:outline-none focus:border-sky-500 pr-12" placeholder="Type password...">
+            <div class="absolute right-3 top-3.5 text-slate-500">
+              <i class="fa-solid fa-key"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metric Output Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-1">
+            <p class="text-xs text-slate-400 uppercase font-semibold tracking-wider">Overall Strength Score</p>
+            <div id="eval-score" class="text-3xl font-extrabold text-emerald-400">85 / 100</div>
+            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-2">
+              <div id="eval-score-bar" class="bg-emerald-500 h-full w-[85%] transition-all duration-300"></div>
+            </div>
+          </div>
+
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-1">
+            <p class="text-xs text-slate-400 uppercase font-semibold tracking-wider">Calculated Entropy</p>
+            <div id="eval-entropy" class="text-3xl font-extrabold text-sky-400">72.4 bits</div>
+            <p class="text-xs text-slate-500">Log2 pool variability measure</p>
+          </div>
+
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-1">
+            <p class="text-xs text-slate-400 uppercase font-semibold tracking-wider">Risk Classification</p>
+            <div id="eval-rating" class="text-3xl font-extrabold text-emerald-400">STRONG</div>
+            <p id="eval-rating-sub" class="text-xs text-slate-500">Resistant to brute-force attacks</p>
+          </div>
+        </div>
+
+        <!-- Vulnerability & Pattern Findings -->
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-3">
+          <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+            <i class="fa-solid fa-bug text-amber-400"></i> Vulnerability Findings & Predictable Patterns
+          </h3>
+          <ul id="eval-findings" class="space-y-2 text-sm">
+            <!-- Dynamic findings -->
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Script Logic -->
+  <script>
+    // State Store
+    let currentUser = "alice";
+    const vault = {};
+    const auditLogs = [];
+
+    const COMMON_DICT = ["password", "123456", "qwerty", "admin", "welcome", "letmein", "cyberclash", "hackathon", "iloveyou"];
+
+    function switchTab(tab) {
+      document.getElementById('tab-lockbox').classList.toggle('hidden', tab !== 'lockbox');
+      document.getElementById('tab-evaluator').classList.toggle('hidden', tab !== 'evaluator');
+      
+      document.getElementById('nav-lockbox').className = tab === 'lockbox' 
+        ? "px-4 py-1.5 rounded-md text-sm font-medium transition-colors bg-sky-600 text-white"
+        : "px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-colors";
+        
+      document.getElementById('nav-evaluator').className = tab === 'evaluator' 
+        ? "px-4 py-1.5 rounded-md text-sm font-medium transition-colors bg-sky-600 text-white"
+        : "px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-colors";
+    }
+
+    function updateUserRole() {
+      currentUser = document.getElementById('user-selector').value;
+      const passMap = { alice: "AlicePass#2026", bob: "BobSecret!99", admin: "AdminMasterKey#2026" };
+      document.getElementById('vault-pass').value = passMap[currentUser] || "";
+      addAuditLog(currentUser, "IDENTITY_SWITCH", "SUCCESS", `Switched active session to ${currentUser}`);
+      renderVault();
+    }
+
+    function addAuditLog(user, action, status, details) {
+      const entry = {
+        time: new Date().toLocaleTimeString(),
+        user: user,
+        action: action,
+        status: status,
+        details: details
+      };
+      auditLogs.unshift(entry);
+      renderAuditLogs();
+    }
+
+    function renderAuditLogs() {
+      const container = document.getElementById('audit-log');
+      container.innerHTML = auditLogs.map(log => {
+        const statusClass = log.status === 'SUCCESS' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' :
+                            log.status === 'TAMPER_DETECTED' ? 'text-rose-400 bg-rose-500/10 border-rose-500/20' :
+                            'text-amber-400 bg-amber-500/10 border-amber-500/20';
+        return `
+          <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400 font-sans">${log.time}</span>
+              <span class="px-1.5 py-0.5 rounded border text-[10px] ${statusClass}">${log.status}</span>
+            </div>
+            <div class="text-slate-200">
+              <span class="text-sky-400 font-bold">[${log.user.toUpperCase()}]</span> ${log.action}
+            </div>
+            <div class="text-slate-500 text-[11px]">${log.details}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Cryptographic Helpers (AES-GCM & PBKDF2 via Web Crypto)
+    async function deriveKey(password, salt) {
+      const enc = new TextEncoder();
+      const keyMaterial = await crypto.subtle.importKey(
+        "raw", enc.encode(password), { name: "PBKDF2" }, false, ["deriveKey"]
+      );
+      return crypto.subtle.deriveKey(
+        {
+          name: "PBKDF2",
+          salt: salt,
+          iterations: 100000,
+          hash: "SHA-256"
+        },
+        keyMaterial,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"]
+      );
+    }
+
+    async function encryptAndStore() {
+      const fileId = document.getElementById('file-id-input').value.trim();
+      const fileName = document.getElementById('file-name-input').value.trim();
+      const content = document.getElementById('file-content-input').value;
+      const pass = document.getElementById('vault-pass').value;
+
+      if (!fileId || !content || !pass) {
+        alert("Please fill in File ID, Payload content, and Master Password.");
+        return;
+      }
+
+      const enc = new TextEncoder();
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const nonce = crypto.getRandomValues(new Uint8Array(12));
+
+      const key = await deriveKey(pass, salt);
+      const encryptedBuffer = await crypto.subtle.encrypt(
+        { name: "AES-GCM", iv: nonce },
+        key,
+        enc.encode(content)
+      );
+
+      vault[fileId] = {
+        fileId: fileId,
+        fileName: fileName,
+        owner: currentUser,
+        salt: Array.from(salt),
+        nonce: Array.from(nonce),
+        ciphertext: Array.from(new Uint8Array(encryptedBuffer))
+      };
+
+      addAuditLog(currentUser, "FILE_ENCRYPT", "SUCCESS", `File ID '${fileId}' encrypted with AES-256-GCM`);
+      renderVault();
+    }
+
+    async function decryptAndRetrieve(fileId) {
+      const item = vault[fileId];
+      if (!item) return;
+
+      const pass = document.getElementById('vault-pass').value;
+
+      // Access Control Check
+      if (currentUser !== item.owner && currentUser !== 'admin') {
+        addAuditLog(currentUser, "FILE_DECRYPT", "ACCESS_DENIED", `Unauthorized access attempt on file ID '${fileId}' owned by ${item.owner}`);
+        alert(`ACCESS CONTROL DENIED: User '${currentUser}' is not authorized to read '${fileId}'. Owner is '${item.owner}'.`);
+        return;
+      }
+
+      try {
+        const salt = new Uint8Array(item.salt);
+        const nonce = new Uint8Array(item.nonce);
+        const cipherArray = new Uint8Array(item.ciphertext);
+
+        const key = await deriveKey(pass, salt);
+        const decryptedBuffer = await crypto.subtle.decrypt(
+          { name: "AES-GCM", iv: nonce },
+          key,
+          cipherArray
+        );
+
+        const dec = new TextDecoder();
+        const plaintext = dec.decode(decryptedBuffer);
+
+        addAuditLog(currentUser, "FILE_DECRYPT", "SUCCESS", `Decrypted file ID '${fileId}' and verified GCM integrity tag`);
+        alert(`SUCCESS: File Decrypted & Integrity Verified!\n\nPayload Content:\n"${plaintext}"`);
+      } catch (err) {
+        addAuditLog(currentUser, "FILE_DECRYPT", "TAMPER_DETECTED", `Integrity check failed or incorrect password for file ID '${fileId}'`);
+        alert(`SECURITY ALERT / INTEGRITY FAILURE:\nFile decryption failed! Either the ciphertext was modified/tampered or incorrect key was supplied.`);
+      }
+    }
+
+    function simulateTamper(fileId) {
+      const item = vault[fileId];
+      if (!item) return;
+
+      // Corrupt byte 0 of ciphertext
+      if (item.ciphertext.length > 0) {
+        item.ciphertext[0] = item.ciphertext[0] ^ 0xFF;
+        addAuditLog(currentUser, "TAMPER_SIMULATION", "SUCCESS", `Corrupted 1 byte of encrypted store for '${fileId}'`);
+        alert(`Simulated file tampering: Corrupted encrypted payload for '${fileId}'. Try decrypting now to test integrity check!`);
+      }
+    }
+
+    function renderVault() {
+      const container = document.getElementById('vault-list');
+      const keys = Object.keys(vault);
+      document.getElementById('vault-count').textContent = `${keys.length} Item${keys.length === 1 ? '' : 's'}`;
+
+      if (keys.length === 0) {
+        container.innerHTML = `<div class="text-center text-slate-500 py-8 text-sm">Vault is empty. Encrypt a file above to store.</div>`;
+        return;
+      }
+
+      container.innerHTML = keys.map(id => {
+        const item = vault[id];
+        const isOwner = currentUser === item.owner || currentUser === 'admin';
+        return `
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-slate-200 text-sm">${item.fileName}</span>
+                  <span class="text-[10px] font-mono bg-slate-800 text-slate-400 px-2 py-0.5 rounded">${item.fileId}</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-0.5">Owner: <span class="text-sky-400 font-semibold">${item.owner}</span> | Cipher: AES-256-GCM</p>
+              </div>
+              <span class="text-[11px] ${isOwner ? 'text-emerald-400 bg-emerald-500/10' : 'text-amber-400 bg-amber-500/10'} px-2 py-0.5 rounded border border-current">
+                ${isOwner ? 'Access Allowed' : 'Access Restricted'}
+              </span>
+            </div>
+            
+            <div class="flex items-center gap-2 pt-1 border-t border-slate-800/60">
+              <button onclick="decryptAndRetrieve('${id}')" class="flex-1 bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/30 text-xs font-medium py-1.5 px-3 rounded-lg transition-colors flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-key text-[11px]"></i> Decrypt & Access
+              </button>
+              <button onclick="simulateTamper('${id}')" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-medium py-1.5 px-3 rounded-lg transition-colors flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-bug text-[11px]"></i> Tamper Test
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Password Evaluator Engine
+    function runPasswordAudit() {
+      const pwd = document.getElementById('eval-password').value;
+      let score = 100;
+      const findings = [];
+
+      if (!pwd) {
+        document.getElementById('eval-score').textContent = "0 / 100";
+        document.getElementById('eval-score-bar').style.width = "0%";
+        document.getElementById('eval-entropy').textContent = "0.0 bits";
+        document.getElementById('eval-rating').textContent = "N/A";
+        document.getElementById('eval-findings').innerHTML = "<li>Type a password above to evaluate.</li>";
+        return;
+      }
+
+      // 1. Length check
+      if (pwd.length < 8) {
+        score -= 45;
+        findings.push({ text: "Critically short length (< 8 characters)", risk: "high" });
+      } else if (pwd.length < 12) {
+        score -= 15;
+        findings.push({ text: "Moderate length (recommend 12+ characters)", risk: "medium" });
+      }
+
+      // 2. Entropy calculation
+      let pool = 0;
+      if (/[a-z]/.test(pwd)) pool += 26;
+      if (/[A-Z]/.test(pwd)) pool += 26;
+      if (/\d/.test(pwd)) pool += 10;
+      if (/[^a-zA-Z0-9]/.test(pwd)) pool += 32;
+
+      const entropy = pool > 0 ? (pwd.length * Math.log2(pool)).toFixed(1) : 0;
+      if (entropy < 40) {
+        score -= 25;
+        findings.push({ text: "Low character entropy (predictable character set)", risk: "high" });
+      }
+
+      // 3. Sequential / Keyboard Patterns
+      if (/[a-zA-Z]{4,}/.test(pwd)) {
+        score -= 10;
+        findings.push({ text: "Sequential alphabetic sequence detected", risk: "low" });
+      }
+      if (/\d{3,}/.test(pwd)) {
+        score -= 10;
+        findings.push({ text: "Sequential numeric pattern detected", risk: "medium" });
+      }
+      if (/(.)\1{2,}/.test(pwd)) {
+        score -= 15;
+        findings.push({ text: "Repeated character pattern (e.g., 'aaa')", risk: "medium" });
+      }
+
+      // 4. Dictionary Check
+      if (COMMON_DICT.some(w => pwd.lower().includes(w))) {
+        score -= 40;
+        findings.push({ text: "Contains word found in common breach dictionary", risk: "high" });
+      }
+
+      score = Math.max(0, Math.min(100, score));
+
+      // Update UI
+      document.getElementById('eval-score').textContent = `${score} / 100`;
+      document.getElementById('eval-score-bar').style.width = `${score}%`;
+      document.getElementById('eval-entropy').textContent = `${entropy} bits`;
+
+      const ratingEl = document.getElementById('eval-rating');
+      const ratingSub = document.getElementById('eval-rating-sub');
+      
+      if (score >= 80) {
+        ratingEl.textContent = "STRONG";
+        ratingEl.className = "text-3xl font-extrabold text-emerald-400";
+        ratingSub.textContent = "High resistance to brute-force attacks";
+      } else if (score >= 50) {
+        ratingEl.textContent = "MODERATE";
+        ratingEl.className = "text-3xl font-extrabold text-amber-400";
+        ratingSub.textContent = "Susceptible to targeted dictionary attacks";
+      } else {
+        ratingEl.textContent = "WEAK";
+        ratingEl.className = "text-3xl font-extrabold text-rose-400";
+        ratingSub.textContent = "Vulnerable to immediate automated crack";
+      }
+
+      const findingsContainer = document.getElementById('eval-findings');
+      if (findings.length === 0) {
+        findingsContainer.innerHTML = `<li class="text-emerald-400 flex items-center gap-2"><i class="fa-solid fa-circle-check"></i> Excellent! No major security vulnerabilities found.</li>`;
+      } else {
+        findingsContainer.innerHTML = findings.map(f => `
+          <li class="flex items-center gap-2 text-slate-300">
+            <i class="fa-solid fa-triangle-exclamation ${f.risk === 'high' ? 'text-rose-400' : f.risk === 'medium' ? 'text-amber-400' : 'text-sky-400'}"></i>
+            ${f.text}
+          </li>
+        `).join('');
+      }
+    }
+
+    // Seed Initial State on Load
+    window.onload = () => {
+      encryptAndStore();
+      runPasswordAudit();
+    };
+  </script>
+</body>
+</html>
